@@ -1,0 +1,151 @@
+<html>
+  <head>
+    <title>IM | websocket</title>
+  </head>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      margin-top: 30px;
+      padding: 0 30px;
+    }
+    header p {
+      padding-left: 30px;
+      color: #666;
+    }
+    #app {
+      margin-top: 30px;
+      padding: 0 30px;
+    }
+    #app li {
+      margin-bottom: 15px;
+    }
+    #app li .nickname {
+      color: #f33;
+    }
+    #app li .time {
+      font-size: 12px;
+      color: #999;
+      margin-right: 20px;
+    }
+    #app li .content {
+      font-size: 13px;
+      color: #333;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      background: #9cf;
+      width: 100%;
+      margin: 0;
+      padding: 10px 20px;
+    }
+    footer p {
+      display: flex;
+      align-items: center;
+    }
+    footer span#nick {
+      margin-right: 20px;
+    }
+    footer input#name {
+      height: 26px;
+      width: 100px;
+      margin-right: 20px;
+      padding-left: 10px;
+    }
+    footer textarea#msg {
+      height: 60px;
+      width: 600px;
+      margin-right: 20px;
+      padding: 10px;
+    }
+    footer button {
+      height: 26px;
+      width: 100px;
+      background: #fff;
+      border: none;
+      outline: none;
+      box-shadow: 0 0 0 1px #999;
+    }
+    footer button:hover {
+      color: #fff;
+      background: #f66;
+    }
+  </style>
+  <body>
+    <header>
+      <h1>IM 聊天室</h1>
+      <p>Websocket 应用实例</p>
+    </header>
+    <article id="app">
+      <h4>现在时间：<span id="time"></span></h4>
+      <ul id="im">
+        <hr />
+
+      </ul>
+    </article>
+    <footer>
+      <p>
+        <textarea id="msg" type="text"></textarea>
+      </p>
+      <p>
+        <span id="nick">昵称：</span>
+        <input id="name" type="text" />
+        <button id="submit">Send</button>
+      </p>
+    </footer>
+
+    <script>
+
+      // setInterval(function() {
+      //   document.getElementById('time').innerHTML = new Date().toLocaleString();
+      // }, 200);
+
+      window.onload = function() {
+
+        var ws = new WebSocket('ws://localhost:3000');
+        ws.onopen = function() {
+
+          ws.onmessage = function(messageEvent) {
+            var message = JSON.parse(messageEvent.data);
+            var type = message.type;
+            var data = message.data;
+            switch(type) {
+              case 'time':
+                document.getElementById('time').innerHTML = data.time;
+                break;
+              case 'chat':
+                console.log('receive a chat message: ', data);
+                var msgNode = document.createElement('li');
+                msgNode.innerHTML = '<span class="nickname">' + data.name + '</span><span class="time">（' + new Date().toLocaleTimeString() + '）</span><span class="content">' + data.msg + '</span>';
+                document.getElementById('im').appendChild(msgNode);
+                break;
+              default:
+            }
+          };
+
+          document.addEventListener('click', function(e) {
+            var target = e.target;
+            var nameInputNode = document.getElementById('name');
+            var msgInputNode = document.getElementById('msg');
+            if(target.id === 'submit') {
+              var m = {
+                type: 'chat',
+                data: {
+                  name: nameInputNode.value || '匿名用户',
+                  msg: msgInputNode.value
+                }
+              };
+              ws.send(JSON.stringify(m));
+              msgInputNode.value = '';
+            }
+          }, false);
+
+        };
+
+      }
+    </script>
+  </body>
+</html>
