@@ -3,7 +3,7 @@
 
 &emsp;&emsp;在过去的一年多时间里，本人参与了公司web ochat项目的开发和持续维护、升级、外接服务等。该项目是一个基于WebSocket的即时通信服务的网页端服务。服务包含了即时聊天、好友、群等各种功能，支持文字、表情、图片、分享、定位、文件、语音等各种消息类型，并包含断线重连、消息补偿等机制。下面跟大家分享一下本人对于WebSocket知识的一些梳理。  
 
-![WebSocket](https://img1.qunarzz.com/m_appPromotion/wap/1701/4f/4ee2c39fedfd5c02.jpg)
+![WebSocket](https://img1.qunarzz.com/m_appPromotion/wap/1701/7e/9fd70c4635e18f02.jpg)
 
 ### 一、 什么是WebSocket？
 
@@ -17,7 +17,7 @@
 
 &emsp;&emsp;WebSocket在建立tcp连接的握手阶段，需要借助于http（https）协议，这一握手过程如图1所示。
 
-![图1. WebSocket握手过程]( https://img1.qunarzz.com/m_appPromotion/wap/1701/56/f70f65b76ed37e02.png)  
+![图1. WebSocket握手过程](https://img1.qunarzz.com/m_appPromotion/wap/1701/1a/3cbb17a5ebbb6f02.jpg)  
 <center>图1. WebSocket握手过程</center>  
 
 &emsp;&emsp;按照步骤来看，首先第一步是发送一个http（https）请求，请求服务器升级到WebSocket通信协议。在这一步的请求头中会包含这些信息：
@@ -107,14 +107,14 @@ ws.onmessage = function(messageEvent) {
 
 &emsp;&emsp;要实现WebSocket服务器端服务，简单来说主要分为这几个步骤：（1）接受和处理握手阶段请求；（2）理解和解析websocket数据帧；（3）分发数据和维持心跳。基本处理流程如图2所示。
 
-![图2. WebSocket服务端基本流程](https://img1.qunarzz.com/m_appPromotion/wap/1701/f0/b86982809a7002.png)  
+![图2. WebSocket服务端基本流程](https://img1.qunarzz.com/m_appPromotion/wap/1701/6f/b244072d7d3e3502.jpg)  
 <center>图2. WebSocket服务端基本流程</center>
 
 ##### 1. 处理握手请求
 
 &emsp;&emsp; 客户端浏览器执行`new WebSocket(ws://****/)`时，首先会发起打开阶段握手请求，这个请求是http的，请求头等信息如图3所示。  
 
-![图3. WebSocket握手请求](https://img1.qunarzz.com/m_appPromotion/wap/1701/1d/b8873d3d28f8e02.png)  
+![图3. WebSocket握手请求](https://img1.qunarzz.com/m_appPromotion/wap/1701/41/3eef69ad72098402.jpg)  
 <center>图3. WebSocket握手请求</center>
 
 在Request Headers中可以看到上文介绍过的几个字段。服务器接收到这个请求之后，首先要将这些字段解析出来，当理解到`Connection: Upgrade`以及`Upgrade: websocket`时，要意识到这是个WebSocket握手请求，需要升级到WebSocket协议，并提取与之相关的几个字段信息，即以`Sec-WebSocket-`开头的字段。其中，有个很重要的验证身份的key即`Sec-WebSocket-Key`（以下简写为key），需要根据这个值计算出另一串字符通过Response Headers中的`Sec-WebSocket-Accept`（以下简写为accept-key）字段返回给客户端，告诉它验证通过。  
@@ -125,10 +125,10 @@ ws.onmessage = function(messageEvent) {
 
 &emsp;&emsp;第二个基本要点是理解WebSocket协议的数据帧格式。图4和图5分别为rfc6455提供的数据帧格式结构图和《深入浅出node.js》（朴灵）一书中提供的数据帧格式图。其中第一幅图标示了每一位的结构，第二幅图则是按照字节分组，大家各自挑顺眼的看。
 
-![图4. RFC6455的WebSocket数据帧格式图](https://img1.qunarzz.com/m_appPromotion/wap/1701/6b/eb07582ca1cfc802.png)  
+![图4. RFC6455的WebSocket数据帧格式图](https://img1.qunarzz.com/m_appPromotion/wap/1701/ba/b274e32aad842302.jpg)  
 <center>图4. RFC6455的WebSocket数据帧格式图</center>
 
-![图5. WebSocket数据帧格式（《深入浅出node.js》）](https://img1.qunarzz.com/m_appPromotion/wap/1701/10/3738f9232faf7102.png)  
+![图5. WebSocket数据帧格式（《深入浅出node.js》）](https://img1.qunarzz.com/m_appPromotion/wap/1701/6f/d28c2a05b7268d02.jpg)  
 <center>图5. WebSocket数据帧格式（《深入浅出node.js》）</center>
 
 &emsp;&emsp;数据帧中的每一位的具体含义可以查找相应资料阅读了解详情，这里简单提一下重要的部分。  
@@ -148,36 +148,36 @@ ws.onmessage = function(messageEvent) {
 
 &emsp;&emsp;`socket.io`除了提供WebSocket服务端封装外，同时也封装了浏览器客户端的WebSocket接口。它能够在不支持WebSocket的浏览器中使用其他技术来兼容，如`xhr-polling`等，并且给使用者暴露了统一的一套api. 所以如果服务端用socket.io的话，浏览器也必须搭配使用socket.io，于是没法用HTML5原生的WebSocket API来编写示例代码。为了容易理解，浏览器端js代码还是用原生api来展现，于是服务端也不选用socket.io来示例了。这里选用了比较单纯的ws模块，仅封装服务端接口。值得一提的是，socket.io十分强大，兼容性好，实际生产中值得信赖。
 
-![图6. 服务端代码：nodejs+koa+ws](https://img1.qunarzz.com/m_appPromotion/wap/1701/7f/a9c900e40e7bf902.png)  
+![图6. 服务端代码：nodejs+koa+ws]( https://img1.qunarzz.com/m_appPromotion/wap/1701/84/496615e666289a02.jpg)  
 <center>图6. 服务端代码：nodejs+koa+ws</center>
 
 &emsp;&emsp;服务使用koa框架，在3000接口同时提供http服务和WebSocket服务。与WebSocket相关的主要代码如图中19-24行，ws模块将会获取到connection为upgrade的握手请求，打开WebSocket连接并让WebSocket消息进入ws的处理流程，其他请求则继续走koa处理流程。其中使用了一个从当前目录引入的ws.js，该模块用来处理WebSocket消息流程，代码如下。
 
-![图7. ws.js](https://img1.qunarzz.com/m_appPromotion/wap/1701/cd/091d2ffac9b5c002.png)  
+![图7. ws.js](https://img1.qunarzz.com/m_appPromotion/wap/1701/21/4d03e1f8ae43b302.jpg)  
 <center>图7. ws.js</center>
 
 &emsp;&emsp;ws模块提供了`clients`这一API用于客户端管理，而代码中的`broadcast`方法是自己实现的一个消息广播的方法，在这个方法里把接受到的消息参数遍历发给每一个client实体，适用于多人即时聊天、全体推送等。代码中的第二段每隔一段时间向客户端发送当前系统时间，用于维持心跳。第三段则监听onmessage，用于接受客户端发来的消息，并广播给所有客户端。
 
-![图8. 前端页面代码](https://img1.qunarzz.com/m_appPromotion/wap/1701/8b/30f20158c6c78c02.png)  
+![图8. 前端页面代码](https://img1.qunarzz.com/m_appPromotion/wap/1701/16/f4c622433a70e102.jpg)  
 <center>图8. 前端页面代码</center>
 
 &emsp;&emsp;收到WebSocket消息后，根据其type字段为time还是chat来区别收到的是维持心跳的系统时间还是聊天内容，如果是时间则更新页面上的时间显示，如果是聊天内容则将聊天信息格式化添加到页面上。具体html不贴了，大家就凭空想象一下吧。附一个效果图。
 
-![图9. 简易聊天室demo效果图](https://img1.qunarzz.com/m_appPromotion/wap/1701/21/599c08cb619ce002.png)  
+![图9. 简易聊天室demo效果图](https://img1.qunarzz.com/m_appPromotion/wap/1701/5e/0b2b96c00e999d02.jpg)  
 <center>图9. 简易聊天室demo效果图</center>
 
 ### 五、 WebSocket其他相关信息
 
 ##### 1. 浏览器支持情况
 
-![图10. WebSocket浏览器端支持情况（来自caniuse.com）](https://img1.qunarzz.com/m_appPromotion/wap/1701/78/a9441447b43ca002.png)  
+![图10. WebSocket浏览器端支持情况（来自caniuse.com）](https://img1.qunarzz.com/m_appPromotion/wap/1701/59/c7122eb1cda44102.jpg)  
 <center>图10. WebSocket浏览器端支持情况（来自caniuse.com）</center>
 
 &emsp;&emsp;目前的主流浏览器基本都已经很好的支持了WebSocket，IE从10开始、安卓web-browser从4.4开始也都支持了WebSocket。不过考虑到国内还有不少用户在使用ie8，如果要兼容这部分用户，可以考虑使用`Socket.IO`库，该库在不支持WebSocket的浏览器中会使用xhr-polling或jsonp-polling等来进行消息收发。Socket.IO还可以在服务端使用，例如可以在nodejs实现的服务端中使用socket.io来搭建WebSocket服务器，并且可以很好的与express框架结合使用。
 
 ##### 2. WebSocket与SPDY、HTTP2的关系
 
-![图11. WebSocket、SPDY、HTTP2功能对比](https://img1.qunarzz.com/m_appPromotion/wap/1701/6d/627ad572997c0502.png)  
+![图11. WebSocket、SPDY、HTTP2功能对比](https://img1.qunarzz.com/m_appPromotion/wap/1701/cb/8ba1f32c9e96f602.jpg)  
 <center>图11. WebSocket、SPDY、HTTP2功能对比</center>
 
 &emsp;&emsp;WebSocket提供了浏览器与服务器的全双工通信，它与SPDY、HTTP/2关注的侧重点以及解决的问题都是有所不同的，也就是说他们并不是对立的竞争者。  
